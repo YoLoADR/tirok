@@ -7,43 +7,101 @@
 pg_dump -U yohannravino -h localhost -s -O -f schema.sql tirok_db
 ```
 
+# Spécifications Techniques du Projet Tirok
+
+## 1. Introduction
+
+Le projet Tirok est une plateforme de financement participatif immobilier qui permet aux vendeurs de lister leurs propriétés, aux investisseurs d'investir dans ces propriétés et aux acquéreurs d'acheter ces propriétés de manière progressive.
+
+## 2. Architecture
+
+Le projet est basé sur une architecture microservices avec une API RESTful construite avec Node.js et Express.js. La base de données utilisée est PostgreSQL.
+
+## 3. Structure de la Base de Données
+
+La base de données comprend les tables suivantes :
+- Utilisateurs
+- Biens immobiliers
+- Tokens
+- Transactions
+- Campagnes de financement participatif
+- Contributions
+- Mensualités
+- Détails financiers
+- Retours sur investissement (ROI)
+- Frais
+
+## 4. Fonctionnalités Principales
+
+- **Listage de propriétés** : Les vendeurs peuvent lister leurs propriétés.
+- **Investissement** : Les investisseurs peuvent investir dans des propriétés listées.
+- **Achat progressif avec Tokens** : Les acquéreurs peuvent acheter des propriétés de manière progressive.
+- **Gestion des transactions** : Les utilisateurs peuvent gérer les transactions de tokens.
+- **Suivi des rendements** : Les investisseurs peuvent suivre leurs rendements annuels.
+
+## 5. Routes API
+
+- `/users`
+- `/properties`
+- `/tokens`
+- `/transactions`
+- `/campaigns`
+- `/contributions`
+- `/payments`
+- `/financial-details`
+
+## 6. Sécurité
+
+- **Authentification** : Authentification nécessaire pour certaines routes.
+- **Validation** : Validation des données entrantes.
+- **Gestion des erreurs** : Gestion centralisée des erreurs.
+
+## 7. Tests
+
+Des tests unitaires et d'intégration sont mis en place.
+
+---
+
+# Structure du Projet `tirok-server`
+
+
 
 tirok-server/
 │
 ├── src/
-│   ├── api/
-│   │   ├── routes/
-│   │   │   ├── users.js
-│   │   │   ├── properties.js
-│   │   │   ├── tokens.js
-│   │   │   ├── transactions.js
-│   │   │   ├── campaigns.js
-│   │   │   └── ... (autres routes)
-│   │   │
-│   │   ├── controllers/
-│   │   │   ├── usersController.js
-│   │   │   ├── propertiesController.js
-│   │   │   └── ... (autres contrôleurs)
-│   │   │
-│   │   ├── middleware/
-│   │   │   └── ... (middlewares comme l'authentification, la validation, etc.)
-│   │   │
-│   │   └── helpers/
-│   │       └── ... (fonctions utilitaires, par exemple pour manipuler les dates, etc.)
-│   │
-│   ├── config/
-│   │   └── database.js (configuration de la base de données)
-│   │
-│   ├── services/
-│   │   └── ... (services pour la logique métier, par exemple pour les calculs financiers)
-│   │
-│   └── models/
-│       ├── user.js
-│       ├── property.js
-│       └── ... (autres modèles)
+│ ├── api/
+│ │ ├── routes/
+│ │ │ ├── users.js
+│ │ │ ├── properties.js
+│ │ │ ├── tokens.js
+│ │ │ ├── transactions.js
+│ │ │ ├── campaigns.js
+│ │ │ └── ... (autres routes)
+│ │ │
+│ │ ├── controllers/
+│ │ │ ├── usersController.js
+│ │ │ ├── propertiesController.js
+│ │ │ └── ... (autres contrôleurs)
+│ │ │
+│ │ ├── middleware/
+│ │ │ └── ... (middlewares comme l'authentification, la validation, etc.)
+│ │ │
+│ │ └── helpers/
+│ │ └── ... (fonctions utilitaires, par exemple pour manipuler les dates, etc.)
+│ │
+│ ├── config/
+│ │ └── database.js (configuration de la base de données)
+│ │
+│ ├── services/
+│ │ └── ... (services pour la logique métier, par exemple pour les calculs financiers)
+│ │
+│ └── models/
+│ ├── user.js
+│ ├── property.js
+│ └── ... (autres modèles)
 │
 ├── tests/
-│   └── ... (tests unitaires et d'intégration)
+│ └── ... (tests unitaires et d'intégration)
 │
 ├── public/ (ressources statiques comme les images, CSS, JS côté client)
 │
