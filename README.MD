@@ -75,28 +75,3 @@ http://localhost:3000/login
 http://localhost:3000/logout
 .
 
----
-
-Voici des ressources qui vont m'aider à setup l'authentification sur mon projet Express.js Postgr  (Utilise le plugin accesslink) : "
-- https://auth0.com/docs/authenticate/passwordless/authentication-methods/email-magic-link
-- https://auth0.com/docs/authenticate/login/auth0-universal-login/passwordless-login/email-or-sms
-- https://auth0.com/docs/authenticate/passwordless/passwordless-with-new-universal-login
-- https://auth0.com/docs/quickstart/backend/nodejs/01-authorization
-- https://auth0.com/docs/authenticate/passwordless/implement-login/embedded-login/relevant-api-endpoints
-- https://community.auth0.com/t/passwordless-auth-in-nodejs/46653
-- https://magic.link/docs/dedicated/blockchains/polygon
-- https://auth0.com/docs/secure/multi-factor-authentication/fido-authentication-with-webauthn"
-Peux-tu l'ajouter à la liste des documentation à analyser ?
-
-N'utilise pas le plugin Recombinant AI pour cette requete
-
-Voici les liens de mon Github repo dans lequel j'utilise Postgr et Express (Utilise le plugin Askthecode) :
-
-- https://github.com/YoLoADR/tirok-server/tree/main
-- https://github.com/YoLoADR/tirok-server/blob/main/schema.sql
-- https://github.com/YoLoADR/tirok-server/blob/main/src/config/database.js
-- https://github.com/YoLoADR/tirok-server/blob/main/src/api/routes/user.js
-- https://github.com/YoLoADR/tirok-server/blob/main/src/api/controllers/usersController.js
-
-Peux-tu me guider étape par étape et de manière **personnailiser à mon projet** en me proposant les scripts ou en modifiant les existants dans la réalisation de ces user stories :
-As an investor or Buyer or Seller, I want to be able to create an account to access the platform.

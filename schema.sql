@@ -425,7 +425,8 @@ CREATE TABLE public.users (
     wallet_address character varying(255),
     role character varying(50) NOT NULL,
     total_invested numeric(20,2),
-    total_tokens integer
+    total_tokens integer,
+    auth0_id character varying(255)
 );
 
 

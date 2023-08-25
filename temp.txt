@@ -1,5 +1,34 @@
   
+{"given_name":"Yohann","family_name":"Ravino","nickname":"atticot.yohann","name":"Yohann Ravino (Yoch)","picture":"https://lh3.googleusercontent.com/a/AAcHTtcMihSje9S0tLvvxkP5QA80v5WHiO76RAwcbkKeGMxb-9P8=s96-c","locale":"en","updated_at":"2023-08-25T06:18:22.755Z","email":"atticot.yohann@gmail.com","email_verified":true,"sub":"google-oauth2|100104363401905102667","sid":"pHGtaCizn_DmC843u2NDWzRubdg9TFTp"}
 
+without google / standart : {"nickname":"yohann.developer","name":"yohann.developer@gmail.com","picture":"https://s.gravatar.com/avatar/6b957595bca4eb3c956633026986dada?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fyo.png","updated_at":"2023-08-25T06:48:59.064Z","email":"yohann.developer@gmail.com","email_verified":false,"sub":"auth0|64e84e3c34efe52999657bf1","sid":"Wm8zEcVAWea1221GzN-oUwaX2kzshRhw"}
+---
+
+Voici des ressources qui vont m'aider à setup l'authentification sur mon projet Express.js Postgr  (Utilise le plugin accesslink) : "
+- https://auth0.com/docs/authenticate/passwordless/authentication-methods/email-magic-link
+- https://auth0.com/docs/authenticate/login/auth0-universal-login/passwordless-login/email-or-sms
+- https://auth0.com/docs/authenticate/passwordless/passwordless-with-new-universal-login
+- https://auth0.com/docs/quickstart/backend/nodejs/01-authorization
+- https://auth0.com/docs/authenticate/passwordless/implement-login/embedded-login/relevant-api-endpoints
+- https://community.auth0.com/t/passwordless-auth-in-nodejs/46653
+- https://magic.link/docs/dedicated/blockchains/polygon
+- https://auth0.com/docs/secure/multi-factor-authentication/fido-authentication-with-webauthn"
+Peux-tu l'ajouter à la liste des documentation à analyser ?
+
+N'utilise pas le plugin Recombinant AI pour cette requete
+
+Voici les liens de mon Github repo dans lequel j'utilise Postgr et Express (Utilise le plugin Askthecode) :
+
+- https://github.com/YoLoADR/tirok-server/tree/main
+- https://github.com/YoLoADR/tirok-server/blob/main/schema.sql
+- https://github.com/YoLoADR/tirok-server/blob/main/src/config/database.js
+- https://github.com/YoLoADR/tirok-server/blob/main/src/api/routes/user.js
+- https://github.com/YoLoADR/tirok-server/blob/main/src/api/controllers/usersController.js
+
+Peux-tu me guider étape par étape et de manière **personnailiser à mon projet** en me proposant les scripts ou en modifiant les existants dans la réalisation de ces user stories :
+As an investor or Buyer or Seller, I want to be able to create an account to access the platform.
+
+----
   
   // Route pour ajouter un bien immobilier
   app.post('/addProperty', async (req, res) => {
