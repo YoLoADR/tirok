@@ -1,5 +1,6 @@
 
 const { faker } = require('@faker-js/faker');
+const pool = require('../config/database');
 
 app.get('/populate', async (req, res) => {
     // Ajout des utilisateurs fictifs
