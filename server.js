@@ -1,35 +1,36 @@
+// const { requiresAuth } = require('express-openid-connect');
 const express = require('express');
 const { auth } = require('express-openid-connect');
+const { ApolloServer } = require('apollo-server-express');
 const authConfig = require('./src/config/authConfig');
-// const { requiresAuth } = require('express-openid-connect');
-const usersRoutes = require('./src/api/routes/user');
-// const propertiesRoutes = require('./src/api/routes/properties');
 require('dotenv').config();
 const ensureUser = require('./src/api/middleware/ensureUser');
+const typeDefs = require('./src/api/schema');
+const resolvers = require('./src/api/resolvers');
 
-// ... autres imports de routes
-
+// Express
 const app = express();
 const PORT = 3000;
-
 
 // Utilisez le routeur d'authentification
 app.use(auth(authConfig));
 app.use(ensureUser);
+
 // Ajoutez une route pour vérifier si l'utilisateur est authentifié
 app.get('/', (req, res) => {
     res.send(req.oidc.isAuthenticated() ? `Logged in : ${JSON.stringify(req.oidc.user)}` : 'Logged out');
 });
-// Any route using "requiresAuth" middleware will check for a valid user session and, if one does not exist, it will redirect the user to log in.
-// app.get('/profile', requiresAuth(), (req, res) => {
-//     res.send(JSON.stringify(req.oidc.user));
-// });
-app.use('/api/users', usersRoutes);
-// app.use('/api/properties', propertiesRoutes);
 
+// GraphQL
+const server = new ApolloServer({ typeDefs, resolvers });
 
-// ... autres utilisations de routes
+// Assurez-vous de démarrer le serveur Apollo avant d'appliquer le middleware
+(async () => {
+    await server.start();
+    server.applyMiddleware({ app });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+})();
+
