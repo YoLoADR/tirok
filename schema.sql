@@ -286,7 +286,8 @@ CREATE TABLE public.properties (
     campaign_end_date date,
     status character varying(50),
     current_investor_share numeric(5,2),
-    current_acquirer_share numeric(5,2)
+    current_acquirer_share numeric(5,2),
+    total_tokens integer DEFAULT 0
 );
 
 
@@ -345,6 +346,36 @@ ALTER SEQUENCE public.roi_roi_id_seq OWNED BY public.roi.roi_id;
 
 
 --
+-- Name: roles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.roles (
+    role_id integer NOT NULL,
+    name character varying(255) NOT NULL
+);
+
+
+--
+-- Name: roles_role_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.roles_role_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: roles_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.roles_role_id_seq OWNED BY public.roles.role_id;
+
+
+--
 -- Name: tokens; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -355,28 +386,9 @@ CREATE TABLE public.tokens (
     token_value numeric(20,2),
     token_symbol character varying(50),
     total_supply integer,
+    tokens_in_circulation integer DEFAULT 0,
     token_contract_address character varying(255)
 );
-
-
---
--- Name: tokens_token_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.tokens_token_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: tokens_token_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.tokens_token_id_seq OWNED BY public.tokens.token_id;
 
 
 --
@@ -414,6 +426,16 @@ ALTER SEQUENCE public.transactions_transaction_id_seq OWNED BY public.transactio
 
 
 --
+-- Name: user_roles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_roles (
+    user_id integer NOT NULL,
+    role_id integer NOT NULL
+);
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -421,9 +443,7 @@ CREATE TABLE public.users (
     user_id integer NOT NULL,
     username character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
-    password character varying(255) NOT NULL,
     wallet_address character varying(255),
-    role character varying(50) NOT NULL,
     total_invested numeric(20,2),
     total_tokens integer,
     auth0_id character varying(255)
@@ -514,10 +534,10 @@ ALTER TABLE ONLY public.roi ALTER COLUMN roi_id SET DEFAULT nextval('public.roi_
 
 
 --
--- Name: tokens token_id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: roles role_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.tokens ALTER COLUMN token_id SET DEFAULT nextval('public.tokens_token_id_seq'::regclass);
+ALTER TABLE ONLY public.roles ALTER COLUMN role_id SET DEFAULT nextval('public.roles_role_id_seq'::regclass);
 
 
 --
@@ -607,6 +627,22 @@ ALTER TABLE ONLY public.roi
 
 
 --
+-- Name: roles roles_name_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_name_key UNIQUE (name);
+
+
+--
+-- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_pkey PRIMARY KEY (role_id);
+
+
+--
 -- Name: tokens tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -620,6 +656,14 @@ ALTER TABLE ONLY public.tokens
 
 ALTER TABLE ONLY public.transactions
     ADD CONSTRAINT transactions_pkey PRIMARY KEY (transaction_id);
+
+
+--
+-- Name: user_roles user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_roles
+    ADD CONSTRAINT user_roles_pkey PRIMARY KEY (user_id, role_id);
 
 
 --
@@ -788,6 +832,22 @@ ALTER TABLE ONLY public.transactions
 
 ALTER TABLE ONLY public.transactions
     ADD CONSTRAINT transactions_token_id_fkey FOREIGN KEY (token_id) REFERENCES public.tokens(token_id);
+
+
+--
+-- Name: user_roles user_roles_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_roles
+    ADD CONSTRAINT user_roles_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(role_id);
+
+
+--
+-- Name: user_roles user_roles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_roles
+    ADD CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
 
 
 --

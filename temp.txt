@@ -1,4 +1,11 @@
-  
+2. Architecture
+Le projet est basé sur une architecture microservices avec une API RESTful construite avec Node.js, Express.js, Auth0, GraphQL et Postgr. 
+
+On 
+
+Ton but est de nous aider pour l'instant pour la partie Tokenisation on l'a fait en web2 pour gagner du temps mais le but c'est de la faire en web3 donc on doit simuler l'environnement web3 afin de facilité la migration.
+
+---
 {"given_name":"Yohann","family_name":"Ravino","nickname":"atticot.yohann","name":"Yohann Ravino (Yoch)","picture":"https://lh3.googleusercontent.com/a/AAcHTtcMihSje9S0tLvvxkP5QA80v5WHiO76RAwcbkKeGMxb-9P8=s96-c","locale":"en","updated_at":"2023-08-25T06:18:22.755Z","email":"atticot.yohann@gmail.com","email_verified":true,"sub":"google-oauth2|100104363401905102667","sid":"pHGtaCizn_DmC843u2NDWzRubdg9TFTp"}
 
 without google / standart : {"nickname":"yohann.developer","name":"yohann.developer@gmail.com","picture":"https://s.gravatar.com/avatar/6b957595bca4eb3c956633026986dada?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fyo.png","updated_at":"2023-08-25T06:48:59.064Z","email":"yohann.developer@gmail.com","email_verified":false,"sub":"auth0|64e84e3c34efe52999657bf1","sid":"Wm8zEcVAWea1221GzN-oUwaX2kzshRhw"}
