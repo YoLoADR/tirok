@@ -31,7 +31,8 @@ CREATE TABLE public.campaigns (
     current_amount numeric(20,2),
     start_date date,
     end_date date,
-    status character varying(50)
+    status character varying(50),
+    stripe_account_id character varying(255)
 );
 
 
@@ -446,7 +447,8 @@ CREATE TABLE public.users (
     wallet_address character varying(255),
     total_invested numeric(20,2),
     total_tokens integer,
-    auth0_id character varying(255)
+    auth0_id character varying(255),
+    stripe_customer_id character varying(255)
 );
 
 

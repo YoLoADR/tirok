@@ -68,10 +68,14 @@ L'authentification est une partie cruciale de toute application, et il est essen
 **Test your login**
 Now your application should be integrated with Auth0. The library provides default routes for logging in and out. You can test out the routes and we will be monitoring your logs in real-time to display relevant information.
 
-**For login**: In your application, visit the /login route provided by the library. If you are running your project on http://localhost:3000 that link would be 
-http://localhost:3000/login
+**For login**: In your application, visit the /login route provided by the library. If you are running your project on http://localhost:3003 that link would be 
+http://localhost:3003/login
 .
-**For logout**: In your application, visit the /logout route provided by the library. If you are running your project on http://localhost:3000 that link would be 
-http://localhost:3000/logout
+**For logout**: In your application, visit the /logout route provided by the library. If you are running your project on http://localhost:3003 that link would be 
+http://localhost:3003/logout
+
+
+## 9. GraphQL Playground
+http://localhost:3003/graphql
 .
 

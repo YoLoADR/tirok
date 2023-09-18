@@ -4,17 +4,15 @@ const { auth } = require('express-openid-connect');
 const { ApolloServer } = require('apollo-server-express');
 const authConfig = require('./src/config/authConfig');
 require('dotenv').config();
-const ensureUser = require('./src/api/middleware/ensureUser');
 const typeDefs = require('./src/api/schema');
 const resolvers = require('./src/api/resolvers');
 
 // Express
 const app = express();
-const PORT = 3000;
+const PORT = 3003;
 
 // Utilisez le routeur d'authentification
 app.use(auth(authConfig));
-app.use(ensureUser);
 
 // Ajoutez une route pour vérifier si l'utilisateur est authentifié
 app.get('/', (req, res) => {

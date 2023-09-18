@@ -1,3 +1,5 @@
+
+
 2. Architecture
 Le projet est basé sur une architecture microservices avec une API RESTful construite avec Node.js, Express.js, Auth0, GraphQL et Postgr. 
 
