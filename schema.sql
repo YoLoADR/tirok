@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.9 (Homebrew)
--- Dumped by pg_dump version 14.9 (Homebrew)
+-- Dumped from database version 15.4
+-- Dumped by pg_dump version 15.4 (Homebrew)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -193,6 +193,36 @@ CREATE SEQUENCE public.investor_properties_investor_property_id_seq
 --
 
 ALTER SEQUENCE public.investor_properties_investor_property_id_seq OWNED BY public.investor_properties.investor_property_id;
+
+
+--
+-- Name: items; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.items (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL
+);
+
+
+--
+-- Name: items_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.items_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.items_id_seq OWNED BY public.items.id;
 
 
 --
@@ -508,6 +538,13 @@ ALTER TABLE ONLY public.investor_properties ALTER COLUMN investor_property_id SE
 
 
 --
+-- Name: items id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.items ALTER COLUMN id SET DEFAULT nextval('public.items_id_seq'::regclass);
+
+
+--
 -- Name: modulations modulation_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -594,6 +631,14 @@ ALTER TABLE ONLY public.financial_details
 
 ALTER TABLE ONLY public.investor_properties
     ADD CONSTRAINT investor_properties_pkey PRIMARY KEY (investor_property_id);
+
+
+--
+-- Name: items items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.items
+    ADD CONSTRAINT items_pkey PRIMARY KEY (id);
 
 
 --
@@ -850,6 +895,188 @@ ALTER TABLE ONLY public.user_roles
 
 ALTER TABLE ONLY public.user_roles
     ADD CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
+
+
+--
+-- Name: TABLE campaigns; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.campaigns TO yohannravino;
+
+
+--
+-- Name: SEQUENCE campaigns_campaign_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.campaigns_campaign_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE contributions; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.contributions TO yohannravino;
+
+
+--
+-- Name: SEQUENCE contributions_contribution_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.contributions_contribution_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE fees; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.fees TO yohannravino;
+
+
+--
+-- Name: SEQUENCE fees_fee_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.fees_fee_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE financial_details; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.financial_details TO yohannravino;
+
+
+--
+-- Name: SEQUENCE financial_details_financial_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.financial_details_financial_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE investor_properties; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.investor_properties TO yohannravino;
+
+
+--
+-- Name: SEQUENCE investor_properties_investor_property_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.investor_properties_investor_property_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE modulations; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.modulations TO yohannravino;
+
+
+--
+-- Name: SEQUENCE modulations_modulation_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.modulations_modulation_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE payments; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.payments TO yohannravino;
+
+
+--
+-- Name: SEQUENCE payments_payment_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.payments_payment_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE properties; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.properties TO yohannravino;
+
+
+--
+-- Name: SEQUENCE properties_property_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.properties_property_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE roi; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.roi TO yohannravino;
+
+
+--
+-- Name: SEQUENCE roi_roi_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.roi_roi_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE roles; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.roles TO yohannravino;
+
+
+--
+-- Name: SEQUENCE roles_role_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.roles_role_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE tokens; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.tokens TO yohannravino;
+
+
+--
+-- Name: TABLE transactions; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.transactions TO yohannravino;
+
+
+--
+-- Name: SEQUENCE transactions_transaction_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.transactions_transaction_id_seq TO yohannravino;
+
+
+--
+-- Name: TABLE user_roles; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.user_roles TO yohannravino;
+
+
+--
+-- Name: TABLE users; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.users TO yohannravino;
+
+
+--
+-- Name: SEQUENCE users_user_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.users_user_id_seq TO yohannravino;
 
 
 --

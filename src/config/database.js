@@ -1,4 +1,4 @@
-const { Pool } = require('pg');
+const { Pool } = require('pg')
 
 const pool = new Pool({
   user: 'yohannravino',
@@ -6,6 +6,6 @@ const pool = new Pool({
   database: 'tirok_db',
   password: 'yohannravino', // Remplacez par votre mot de passe
   port: 5432,
-});
+})
 
-module.exports = pool;
+module.exports = pool

@@ -1,8 +1,7 @@
-
-
 ## Pour obtenir un aperçu du schéma de votre base de données PostgreSQL depuis la ligne de commande, vous pouvez utiliser la commande `pg_dump` avec l'option `--schema-only`. Voici comment vous pouvez le faire :
 
 1. **Exporter le schéma de la base de données** :
+
 ```bash
 pg_dump -U yohannravino -h localhost -s -O -f schema.sql tirok_db
 ```
@@ -20,16 +19,11 @@ Le projet est basé sur une architecture microservices avec une API RESTful cons
 ## 3. Structure de la Base de Données
 
 La base de données comprend les tables suivantes :
-- Utilisateurs
-- Biens immobiliers
-- Tokens
-- Transactions
-- Campagnes de financement participatif
-- Contributions
-- Mensualités
-- Détails financiers
-- Retours sur investissement (ROI)
-- Frais
+users: Une table pour les utilisateurs. La wallet_address est optionnelle.
+user_roles: Une table d'association entre les utilisateurs et leurs rôles. Elle utilise un type ENUM pour les rôles.
+rented_properties: Une table pour les propriétés louées. Une clé étrangère vers property_campaigns est ajoutée plus tard pour établir la relation.
+property_campaigns: Une table pour les campagnes de propriété. Le champ status est un VARCHAR, mais vous pourriez également utiliser un type ENUM si vous le souhaitez.
+transactions: Une table pour les transactions. Elle utilise un type ENUM pour le type de transaction.
 
 ## 4. Fonctionnalités Principales
 
@@ -60,22 +54,22 @@ La base de données comprend les tables suivantes :
 
 Des tests unitaires et d'intégration sont mis en place.
 
-
 ---
+
 ## 8. Authentification
+
 L'authentification est une partie cruciale de toute application, et il est essentiel de choisir une solution qui peut évoluer avec vos besoins futurs, en particulier avec l'intégration de l'authentification Web3.
 
 **Test your login**
 Now your application should be integrated with Auth0. The library provides default routes for logging in and out. You can test out the routes and we will be monitoring your logs in real-time to display relevant information.
 
-**For login**: In your application, visit the /login route provided by the library. If you are running your project on http://localhost:3003 that link would be 
+**For login**: In your application, visit the /login route provided by the library. If you are running your project on http://localhost:3003 that link would be
 http://localhost:3003/login
 .
-**For logout**: In your application, visit the /logout route provided by the library. If you are running your project on http://localhost:3003 that link would be 
+**For logout**: In your application, visit the /logout route provided by the library. If you are running your project on http://localhost:3003 that link would be
 http://localhost:3003/logout
 
-
 ## 9. GraphQL Playground
+
 http://localhost:3003/graphql
 .
-

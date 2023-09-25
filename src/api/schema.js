@@ -1,76 +1,48 @@
 // src/graphql/schema.js
 
-const { gql } = require('apollo-server-express');
+const { gql } = require('apollo-server-express')
 
 const typeDefs = gql`
-  type Role {
-    role_id: Int!
+  type Item {
+    id: ID!
     name: String!
   }
 
   type User {
-    user_id: Int!
+    id: ID!
     username: String!
     email: String!
+    auth0_id: String!
     wallet_address: String
     roles: [Role!]!
+    contributions: [PropertyCampaign!]!
+    secondaryMarketPurchases: [Transaction!]!
+    rentedProperty: RentedProperty
+    transactions: [Transaction!]!
     total_invested: Float
     total_tokens: Int
-    auth0_id: String!
-    contributions: [Contribution!]!
-    properties: [Property!]!
-    transactions: [Transaction!]!
+    stripe_customer_id: String
   }
 
-  type Contribution {
-    contribution_id: Int!
-    campaign_id: Int!
-    investor_id: Int!
-    amount: Float!
-    tokens_received: Int
-    timestamp: String
-    campaign: Campaign
-    investor: User
-  }
-  
-  type Token {
-    token_id: Int!
-    property_id: Int!
-    owner_id: Int!
-    token_value: Float!
-    token_symbol: String
-    total_supply: Int
-    tokens_in_circulation: Int
-    token_contract_address: String
-    property: Property
-    owner: User
-  }
-  
-  type ROI {
-    roi_id: Int
-    investor_id: Int
-    property_id: Int
-    year: Int
-    amount: Float
-    timestamp: String
-    investor: User
-    property: Property
-  }
-  
-  type UserRole {
-    user_id: Int!
-    role_id: Int!
+  enum Role {
+    SELLER
+    BUYER
+    INVESTOR
   }
 
+  type RentedProperty {
+    propertyCampaign: PropertyCampaign!
+    monthlyRent: Float!
+    duration: Int!
+  }
 
-  type Property {
-    property_id: Int!
-    seller_id: Int!
-    description: String
-    localisation: String
-    total_value: Float
-    charges_estimation: Float
-    energy_bill_estimation: Float
+  type PropertyCampaign {
+    id: ID!
+    description: String!
+    localisation: String!
+    total_value: Float!
+    charges_estimation: Float!
+    energy_bill_estimation: Float!
     construction_year: Int
     room_count: Int
     bedroom_count: Int
@@ -78,70 +50,12 @@ const typeDefs = gql`
     area: Float
     dpe: String
     ges: String
-    campaign_end_date: String
-    status: String
-    current_investor_share: Float
-    current_acquirer_share: Float
-    campaigns: [Campaign!]!
-    tokens: [Token!]!
-    roi: [ROI!]!
-  }
-
-  type Campaign {
-    campaign_id: Int!
-    property_id: Int!
     goal_amount: Float
     current_amount: Float
     start_date: String
     end_date: String
-    status: String
-    stripe_account_id: String
-    contributions: [Contribution!]!
-    property: Property
-    tokens: [Token!]!
-    roi: ROI  
-    financialDetails: [FinancialDetail]  
-  }
-
-  type Transaction {
-    transaction_id: Int!
-    sender_id: Int!
-    receiver_id: Int!
-    token_id: Int!
-    amount: Int!
-    timestamp: String
-    sender: User
-    receiver: User
-    token: Token
-  }
-
-  type Payment {
-    payment_id: Int!
-    acquirer_id: Int!
-    property_id: Int!
-    amount_paid: Float!
-    payment_date: String
-    timestamp: String
-    remaining_amount: Float
-    modulated_amount: Float
-    acquirer: User
-    property: Property
-  }
-
-  type Modulation {
-    modulation_id: Int!
-    acquirer_id: Int!
-    property_id: Int!
-    new_monthly_amount: Float!
-    reason: String
-    timestamp: String
-    acquirer: User
-    property: Property
-  }
-
-  type FinancialDetail {
-    financial_id: Int!
-    acquirer_id: Int!
+    status: CampaignStatus!
+    contributors: [User!]!
     initial_deposit: Float!
     renovation_cost: Float!
     notary_fees: Float!
@@ -150,44 +64,75 @@ const typeDefs = gql`
     loan_duration: Int!
     total_paid: Float!
     total_remaining: Float!
-    acquirer: User
   }
-  
+
+  enum CampaignStatus {
+    ONGOING
+    COMPLETED
+    FAILED
+  }
+
+  type Transaction {
+    id: ID!
+    user: User!
+    amount: Float!
+    type: TransactionType!
+    propertyCampaign: PropertyCampaign!
+    timestamp: String!
+  }
+
+  enum TransactionType {
+    INVESTMENT
+    PAYMENT
+    SECONDARY_MARKET_PURCHASE
+  }
 
   type Query {
-    getProperty(property_id: Int!): Property
-    getAllProperties: [Property!]!
-    getCampaign(campaign_id: Int!): Campaign
-    getAllCampaigns: [Campaign!]!
-    getAllCampaignsWithDetails: [Campaign!]!
-    getCampaignWithDetails(campaign_id: Int!): Campaign
-    getUserById(auth0_id: String!): User
+    getItems: [Item]
+    getUserById(id: ID!): User
+    getAllUsers: [User!]!
+    getPropertyCampaign(id: ID!): PropertyCampaign
+    getAllPropertyCampaigns: [PropertyCampaign!]!
+    getTransactions: [Transaction]
   }
 
   type Mutation {
-      createProperty(input: PropertyInput!): Property
-      updateProperty(property_id: Int!, input: PropertyInput!): Property
-      deleteProperty(property_id: Int!): Boolean
+    createItem(name: String!): Item
+    deleteItem(id: ID!): Item
 
-      createCampaign(input: CampaignInput!): Campaign
-      updateCampaign(campaign_id: Int!, input: CampaignInput!): Campaign
-      deleteCampaign(campaign_id: Int!): Boolean
+    createUser(input: UserInput!): User
+    updateUser(id: ID!, input: UserInput!): User
+    deleteUser(id: ID!): Boolean
+    ensureUser(auth0Id: String, email: String, walletAddress: String): Boolean
 
-      ensureUser(auth0Id: String, email: String, walletAddress: String): Boolean
-      
-      updateUser(auth0_id: String!, username: String, email: String, wallet_address: String, role: String): User
-      deleteUser(auth0_id: String!): Boolean
-      addUserRole(auth0_id: String!, roleName: String!): Boolean
-      removeUserRole(auth0_id: String!, roleName: String!): Boolean
+    addUserRole(auth0_id: String!, roleName: String!): Boolean
+    removeUserRole(auth0_id: String!, roleName: String!): Boolean
+
+    createPropertyCampaign(input: PropertyCampaignInput!): PropertyCampaign
+    updatePropertyCampaign(
+      id: ID!
+      input: PropertyCampaignInput!
+    ): PropertyCampaign
+    deletePropertyCampaign(id: ID!): Boolean
+
+    createTransaction(input: TransactionInput!): Transaction
+    updateTransaction(id: ID!, input: TransactionInput!): Transaction
+    deleteTransaction(id: ID!): Boolean
   }
 
-  input PropertyInput {
-    seller_id: Int!
-    description: String
-    localisation: String
-    total_value: Float
-    charges_estimation: Float
-    energy_bill_estimation: Float
+  input UserInput {
+    username: String
+    email: String
+    auth0_id: String
+    wallet_address: String
+  }
+
+  input PropertyCampaignInput {
+    description: String!
+    localisation: String!
+    total_value: Float!
+    charges_estimation: Float!
+    energy_bill_estimation: Float!
     construction_year: Int
     room_count: Int
     bedroom_count: Int
@@ -195,20 +140,24 @@ const typeDefs = gql`
     area: Float
     dpe: String
     ges: String
-    campaign_end_date: String
-    status: String
-    current_investor_share: Float
-    current_acquirer_share: Float
-  }
-
-  input CampaignInput {
-    property_id: Int!
     goal_amount: Float
     current_amount: Float
     start_date: String
     end_date: String
-    status: String
+    status: CampaignStatus!
+    initial_deposit: Float!
+    renovation_cost: Float!
+    notary_fees: Float!
+    loan_amount: Float!
+    interest_cost: Float!
+    loan_duration: Int!
   }
-`;
 
-module.exports = typeDefs;
+  input TransactionInput {
+    propertyCampaignId: ID!
+    userId: ID!
+    amount: Float!
+  }
+`
+
+module.exports = typeDefs
