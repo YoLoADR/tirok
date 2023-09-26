@@ -24,10 +24,9 @@ const typeDefs = gql`
     stripe_customer_id: String
   }
 
-  enum Role {
-    SELLER
-    BUYER
-    INVESTOR
+  type Role {
+    role_id: ID!
+    name: String!
   }
 
   type RentedProperty {
@@ -41,8 +40,8 @@ const typeDefs = gql`
     description: String!
     localisation: String!
     total_value: Float!
-    charges_estimation: Float!
-    energy_bill_estimation: Float!
+    charges_estimation: Float
+    energy_bill_estimation: Float
     construction_year: Int
     room_count: Int
     bedroom_count: Int
@@ -55,15 +54,15 @@ const typeDefs = gql`
     start_date: String
     end_date: String
     status: CampaignStatus!
-    contributors: [User!]!
-    initial_deposit: Float!
-    renovation_cost: Float!
-    notary_fees: Float!
-    loan_amount: Float!
-    interest_cost: Float!
-    loan_duration: Int!
-    total_paid: Float!
-    total_remaining: Float!
+    contributors: [User!]
+    initial_deposit: Float
+    renovation_cost: Float
+    notary_fees: Float
+    loan_amount: Float
+    interest_cost: Float
+    loan_duration: Int
+    total_paid: Int
+    total_remaining: Float
   }
 
   enum CampaignStatus {
@@ -76,9 +75,9 @@ const typeDefs = gql`
     id: ID!
     user: User!
     amount: Float!
-    type: TransactionType!
-    propertyCampaign: PropertyCampaign!
-    timestamp: String!
+    type: TransactionType
+    propertyCampaign: PropertyCampaign
+    timestamp: String
   }
 
   enum TransactionType {
@@ -89,7 +88,7 @@ const typeDefs = gql`
 
   type Query {
     getItems: [Item]
-    getUserById(id: ID!): User
+    getUserById(auth0_id: ID!): User
     getAllUsers: [User!]!
     getPropertyCampaign(id: ID!): PropertyCampaign
     getAllPropertyCampaigns: [PropertyCampaign!]!
@@ -128,11 +127,11 @@ const typeDefs = gql`
   }
 
   input PropertyCampaignInput {
-    description: String!
-    localisation: String!
-    total_value: Float!
-    charges_estimation: Float!
-    energy_bill_estimation: Float!
+    description: String
+    localisation: String
+    total_value: Float
+    charges_estimation: Float
+    energy_bill_estimation: Float
     construction_year: Int
     room_count: Int
     bedroom_count: Int
@@ -144,13 +143,13 @@ const typeDefs = gql`
     current_amount: Float
     start_date: String
     end_date: String
-    status: CampaignStatus!
-    initial_deposit: Float!
-    renovation_cost: Float!
-    notary_fees: Float!
-    loan_amount: Float!
-    interest_cost: Float!
-    loan_duration: Int!
+    status: CampaignStatus
+    initial_deposit: Float
+    renovation_cost: Float
+    notary_fees: Float
+    loan_amount: Float
+    interest_cost: Float
+    loan_duration: Int
   }
 
   input TransactionInput {

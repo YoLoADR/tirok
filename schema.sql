@@ -16,184 +16,31 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: role; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.role AS ENUM (
+    'SELLER',
+    'BUYER',
+    'INVESTOR'
+);
+
+
+--
+-- Name: transaction_type; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.transaction_type AS ENUM (
+    'INVESTMENT',
+    'PAYMENT',
+    'SECONDARY_MARKET_PURCHASE'
+);
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
-
---
--- Name: campaigns; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.campaigns (
-    campaign_id integer NOT NULL,
-    property_id integer,
-    goal_amount numeric(20,2),
-    current_amount numeric(20,2),
-    start_date date,
-    end_date date,
-    status character varying(50),
-    stripe_account_id character varying(255)
-);
-
-
---
--- Name: campaigns_campaign_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.campaigns_campaign_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: campaigns_campaign_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.campaigns_campaign_id_seq OWNED BY public.campaigns.campaign_id;
-
-
---
--- Name: contributions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.contributions (
-    contribution_id integer NOT NULL,
-    campaign_id integer,
-    investor_id integer,
-    amount numeric(20,2),
-    tokens_received integer,
-    "timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP
-);
-
-
---
--- Name: contributions_contribution_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.contributions_contribution_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: contributions_contribution_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.contributions_contribution_id_seq OWNED BY public.contributions.contribution_id;
-
-
---
--- Name: fees; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.fees (
-    fee_id integer NOT NULL,
-    type character varying(50),
-    percentage numeric(5,2),
-    amount numeric(20,2),
-    transaction_id integer,
-    "timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP
-);
-
-
---
--- Name: fees_fee_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.fees_fee_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: fees_fee_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.fees_fee_id_seq OWNED BY public.fees.fee_id;
-
-
---
--- Name: financial_details; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.financial_details (
-    financial_id integer NOT NULL,
-    acquirer_id integer,
-    initial_deposit numeric(20,2),
-    renovation_cost numeric(20,2),
-    notary_fees numeric(20,2),
-    loan_amount numeric(20,2),
-    interest_cost numeric(20,2),
-    loan_duration integer,
-    total_paid numeric(20,2),
-    total_remaining numeric(20,2)
-);
-
-
---
--- Name: financial_details_financial_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.financial_details_financial_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: financial_details_financial_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.financial_details_financial_id_seq OWNED BY public.financial_details.financial_id;
-
-
---
--- Name: investor_properties; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.investor_properties (
-    investor_property_id integer NOT NULL,
-    investor_id integer,
-    property_id integer,
-    amount_invested numeric(20,2),
-    tokens_held integer
-);
-
-
---
--- Name: investor_properties_investor_property_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.investor_properties_investor_property_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: investor_properties_investor_property_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.investor_properties_investor_property_id_seq OWNED BY public.investor_properties.investor_property_id;
-
 
 --
 -- Name: items; Type: TABLE; Schema: public; Owner: -
@@ -226,107 +73,44 @@ ALTER SEQUENCE public.items_id_seq OWNED BY public.items.id;
 
 
 --
--- Name: modulations; Type: TABLE; Schema: public; Owner: -
+-- Name: property_campaigns; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.modulations (
-    modulation_id integer NOT NULL,
-    acquirer_id integer,
-    property_id integer,
-    new_monthly_amount numeric(20,2),
-    reason text,
-    "timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP
-);
-
-
---
--- Name: modulations_modulation_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.modulations_modulation_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: modulations_modulation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.modulations_modulation_id_seq OWNED BY public.modulations.modulation_id;
-
-
---
--- Name: payments; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.payments (
-    payment_id integer NOT NULL,
-    acquirer_id integer,
-    property_id integer,
-    amount_paid numeric(20,2),
-    payment_date date,
-    "timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    remaining_amount numeric(20,2),
-    modulated_amount numeric(20,2)
-);
-
-
---
--- Name: payments_payment_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.payments_payment_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: payments_payment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.payments_payment_id_seq OWNED BY public.payments.payment_id;
-
-
---
--- Name: properties; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.properties (
-    property_id integer NOT NULL,
-    seller_id integer,
-    description text,
-    localisation character varying(255),
-    total_value numeric(20,2),
-    charges_estimation numeric(20,2),
-    energy_bill_estimation numeric(20,2),
+CREATE TABLE public.property_campaigns (
+    id integer NOT NULL,
+    description text NOT NULL,
+    localisation character varying,
+    total_value double precision,
+    charges_estimation double precision,
+    energy_bill_estimation double precision,
     construction_year integer,
     room_count integer,
     bedroom_count integer,
     floor_number integer,
-    area numeric(10,2),
-    dpe character varying(50),
-    ges character varying(50),
-    campaign_end_date date,
-    status character varying(50),
-    current_investor_share numeric(5,2),
-    current_acquirer_share numeric(5,2),
-    total_tokens integer DEFAULT 0
+    area double precision,
+    dpe character varying,
+    ges character varying,
+    goal_amount double precision,
+    current_amount double precision,
+    start_date date NOT NULL,
+    end_date date,
+    status character varying NOT NULL,
+    initial_deposit double precision,
+    renovation_cost double precision NOT NULL,
+    notary_fees double precision,
+    loan_amount double precision,
+    interest_cost double precision,
+    loan_duration integer,
+    total_paid double precision,
+    total_remaining double precision
 );
 
 
 --
--- Name: properties_property_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: property_campaigns_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.properties_property_id_seq
+CREATE SEQUENCE public.property_campaigns_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -336,31 +120,29 @@ CREATE SEQUENCE public.properties_property_id_seq
 
 
 --
--- Name: properties_property_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: property_campaigns_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.properties_property_id_seq OWNED BY public.properties.property_id;
+ALTER SEQUENCE public.property_campaigns_id_seq OWNED BY public.property_campaigns.id;
 
 
 --
--- Name: roi; Type: TABLE; Schema: public; Owner: -
+-- Name: rented_properties; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.roi (
-    roi_id integer NOT NULL,
-    investor_id integer,
-    property_id integer,
-    year integer,
-    amount numeric(20,2),
-    "timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE public.rented_properties (
+    id integer NOT NULL,
+    property_campaign_id integer NOT NULL,
+    monthly_rent double precision NOT NULL,
+    duration integer NOT NULL
 );
 
 
 --
--- Name: roi_roi_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: rented_properties_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.roi_roi_id_seq
+CREATE SEQUENCE public.rented_properties_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -370,56 +152,10 @@ CREATE SEQUENCE public.roi_roi_id_seq
 
 
 --
--- Name: roi_roi_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: rented_properties_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.roi_roi_id_seq OWNED BY public.roi.roi_id;
-
-
---
--- Name: roles; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.roles (
-    role_id integer NOT NULL,
-    name character varying(255) NOT NULL
-);
-
-
---
--- Name: roles_role_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.roles_role_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: roles_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.roles_role_id_seq OWNED BY public.roles.role_id;
-
-
---
--- Name: tokens; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.tokens (
-    token_id integer NOT NULL,
-    property_id integer,
-    owner_id integer,
-    token_value numeric(20,2),
-    token_symbol character varying(50),
-    total_supply integer,
-    tokens_in_circulation integer DEFAULT 0,
-    token_contract_address character varying(255)
-);
+ALTER SEQUENCE public.rented_properties_id_seq OWNED BY public.rented_properties.id;
 
 
 --
@@ -427,20 +163,20 @@ CREATE TABLE public.tokens (
 --
 
 CREATE TABLE public.transactions (
-    transaction_id integer NOT NULL,
-    sender_id integer,
-    receiver_id integer,
-    token_id integer,
-    amount integer,
-    "timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    id integer NOT NULL,
+    user_id integer,
+    amount double precision NOT NULL,
+    type public.transaction_type NOT NULL,
+    property_campaign_id integer,
+    "timestamp" timestamp without time zone NOT NULL
 );
 
 
 --
--- Name: transactions_transaction_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: transactions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.transactions_transaction_id_seq
+CREATE SEQUENCE public.transactions_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -450,10 +186,10 @@ CREATE SEQUENCE public.transactions_transaction_id_seq
 
 
 --
--- Name: transactions_transaction_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.transactions_transaction_id_seq OWNED BY public.transactions.transaction_id;
+ALTER SEQUENCE public.transactions_id_seq OWNED BY public.transactions.id;
 
 
 --
@@ -461,8 +197,8 @@ ALTER SEQUENCE public.transactions_transaction_id_seq OWNED BY public.transactio
 --
 
 CREATE TABLE public.user_roles (
-    user_id integer NOT NULL,
-    role_id integer NOT NULL
+    user_id integer,
+    role public.role NOT NULL
 );
 
 
@@ -503,41 +239,6 @@ ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
 
 
 --
--- Name: campaigns campaign_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.campaigns ALTER COLUMN campaign_id SET DEFAULT nextval('public.campaigns_campaign_id_seq'::regclass);
-
-
---
--- Name: contributions contribution_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.contributions ALTER COLUMN contribution_id SET DEFAULT nextval('public.contributions_contribution_id_seq'::regclass);
-
-
---
--- Name: fees fee_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fees ALTER COLUMN fee_id SET DEFAULT nextval('public.fees_fee_id_seq'::regclass);
-
-
---
--- Name: financial_details financial_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.financial_details ALTER COLUMN financial_id SET DEFAULT nextval('public.financial_details_financial_id_seq'::regclass);
-
-
---
--- Name: investor_properties investor_property_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.investor_properties ALTER COLUMN investor_property_id SET DEFAULT nextval('public.investor_properties_investor_property_id_seq'::regclass);
-
-
---
 -- Name: items id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -545,45 +246,24 @@ ALTER TABLE ONLY public.items ALTER COLUMN id SET DEFAULT nextval('public.items_
 
 
 --
--- Name: modulations modulation_id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: property_campaigns id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.modulations ALTER COLUMN modulation_id SET DEFAULT nextval('public.modulations_modulation_id_seq'::regclass);
-
-
---
--- Name: payments payment_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.payments ALTER COLUMN payment_id SET DEFAULT nextval('public.payments_payment_id_seq'::regclass);
+ALTER TABLE ONLY public.property_campaigns ALTER COLUMN id SET DEFAULT nextval('public.property_campaigns_id_seq'::regclass);
 
 
 --
--- Name: properties property_id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: rented_properties id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.properties ALTER COLUMN property_id SET DEFAULT nextval('public.properties_property_id_seq'::regclass);
-
-
---
--- Name: roi roi_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.roi ALTER COLUMN roi_id SET DEFAULT nextval('public.roi_roi_id_seq'::regclass);
+ALTER TABLE ONLY public.rented_properties ALTER COLUMN id SET DEFAULT nextval('public.rented_properties_id_seq'::regclass);
 
 
 --
--- Name: roles role_id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: transactions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.roles ALTER COLUMN role_id SET DEFAULT nextval('public.roles_role_id_seq'::regclass);
-
-
---
--- Name: transactions transaction_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.transactions ALTER COLUMN transaction_id SET DEFAULT nextval('public.transactions_transaction_id_seq'::regclass);
+ALTER TABLE ONLY public.transactions ALTER COLUMN id SET DEFAULT nextval('public.transactions_id_seq'::regclass);
 
 
 --
@@ -591,46 +271,6 @@ ALTER TABLE ONLY public.transactions ALTER COLUMN transaction_id SET DEFAULT nex
 --
 
 ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.users_user_id_seq'::regclass);
-
-
---
--- Name: campaigns campaigns_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.campaigns
-    ADD CONSTRAINT campaigns_pkey PRIMARY KEY (campaign_id);
-
-
---
--- Name: contributions contributions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.contributions
-    ADD CONSTRAINT contributions_pkey PRIMARY KEY (contribution_id);
-
-
---
--- Name: fees fees_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fees
-    ADD CONSTRAINT fees_pkey PRIMARY KEY (fee_id);
-
-
---
--- Name: financial_details financial_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.financial_details
-    ADD CONSTRAINT financial_details_pkey PRIMARY KEY (financial_id);
-
-
---
--- Name: investor_properties investor_properties_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.investor_properties
-    ADD CONSTRAINT investor_properties_pkey PRIMARY KEY (investor_property_id);
 
 
 --
@@ -642,59 +282,19 @@ ALTER TABLE ONLY public.items
 
 
 --
--- Name: modulations modulations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: property_campaigns property_campaigns_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.modulations
-    ADD CONSTRAINT modulations_pkey PRIMARY KEY (modulation_id);
-
-
---
--- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.payments
-    ADD CONSTRAINT payments_pkey PRIMARY KEY (payment_id);
+ALTER TABLE ONLY public.property_campaigns
+    ADD CONSTRAINT property_campaigns_pkey PRIMARY KEY (id);
 
 
 --
--- Name: properties properties_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: rented_properties rented_properties_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.properties
-    ADD CONSTRAINT properties_pkey PRIMARY KEY (property_id);
-
-
---
--- Name: roi roi_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.roi
-    ADD CONSTRAINT roi_pkey PRIMARY KEY (roi_id);
-
-
---
--- Name: roles roles_name_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.roles
-    ADD CONSTRAINT roles_name_key UNIQUE (name);
-
-
---
--- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.roles
-    ADD CONSTRAINT roles_pkey PRIMARY KEY (role_id);
-
-
---
--- Name: tokens tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tokens
-    ADD CONSTRAINT tokens_pkey PRIMARY KEY (token_id);
+ALTER TABLE ONLY public.rented_properties
+    ADD CONSTRAINT rented_properties_pkey PRIMARY KEY (id);
 
 
 --
@@ -702,15 +302,15 @@ ALTER TABLE ONLY public.tokens
 --
 
 ALTER TABLE ONLY public.transactions
-    ADD CONSTRAINT transactions_pkey PRIMARY KEY (transaction_id);
+    ADD CONSTRAINT transactions_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_roles user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_roles user_roles_user_id_role_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_roles
-    ADD CONSTRAINT user_roles_pkey PRIMARY KEY (user_id, role_id);
+    ADD CONSTRAINT user_roles_user_id_role_key UNIQUE (user_id, role);
 
 
 --
@@ -730,163 +330,27 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: campaigns campaigns_property_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: rented_properties rented_properties_property_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.campaigns
-    ADD CONSTRAINT campaigns_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(property_id);
-
-
---
--- Name: contributions contributions_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.contributions
-    ADD CONSTRAINT contributions_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES public.campaigns(campaign_id);
+ALTER TABLE ONLY public.rented_properties
+    ADD CONSTRAINT rented_properties_property_campaign_id_fkey FOREIGN KEY (property_campaign_id) REFERENCES public.property_campaigns(id);
 
 
 --
--- Name: contributions contributions_investor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.contributions
-    ADD CONSTRAINT contributions_investor_id_fkey FOREIGN KEY (investor_id) REFERENCES public.users(user_id);
-
-
---
--- Name: fees fees_transaction_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fees
-    ADD CONSTRAINT fees_transaction_id_fkey FOREIGN KEY (transaction_id) REFERENCES public.transactions(transaction_id);
-
-
---
--- Name: financial_details financial_details_acquirer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.financial_details
-    ADD CONSTRAINT financial_details_acquirer_id_fkey FOREIGN KEY (acquirer_id) REFERENCES public.users(user_id);
-
-
---
--- Name: investor_properties investor_properties_investor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.investor_properties
-    ADD CONSTRAINT investor_properties_investor_id_fkey FOREIGN KEY (investor_id) REFERENCES public.users(user_id);
-
-
---
--- Name: investor_properties investor_properties_property_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.investor_properties
-    ADD CONSTRAINT investor_properties_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(property_id);
-
-
---
--- Name: modulations modulations_acquirer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.modulations
-    ADD CONSTRAINT modulations_acquirer_id_fkey FOREIGN KEY (acquirer_id) REFERENCES public.users(user_id);
-
-
---
--- Name: modulations modulations_property_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.modulations
-    ADD CONSTRAINT modulations_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(property_id);
-
-
---
--- Name: payments payments_acquirer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.payments
-    ADD CONSTRAINT payments_acquirer_id_fkey FOREIGN KEY (acquirer_id) REFERENCES public.users(user_id);
-
-
---
--- Name: payments payments_property_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.payments
-    ADD CONSTRAINT payments_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(property_id);
-
-
---
--- Name: properties properties_seller_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.properties
-    ADD CONSTRAINT properties_seller_id_fkey FOREIGN KEY (seller_id) REFERENCES public.users(user_id);
-
-
---
--- Name: roi roi_investor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.roi
-    ADD CONSTRAINT roi_investor_id_fkey FOREIGN KEY (investor_id) REFERENCES public.users(user_id);
-
-
---
--- Name: roi roi_property_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.roi
-    ADD CONSTRAINT roi_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(property_id);
-
-
---
--- Name: tokens tokens_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tokens
-    ADD CONSTRAINT tokens_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.users(user_id);
-
-
---
--- Name: tokens tokens_property_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tokens
-    ADD CONSTRAINT tokens_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(property_id);
-
-
---
--- Name: transactions transactions_receiver_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: transactions transactions_property_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.transactions
-    ADD CONSTRAINT transactions_receiver_id_fkey FOREIGN KEY (receiver_id) REFERENCES public.users(user_id);
+    ADD CONSTRAINT transactions_property_campaign_id_fkey FOREIGN KEY (property_campaign_id) REFERENCES public.property_campaigns(id);
 
 
 --
--- Name: transactions transactions_sender_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.transactions
-    ADD CONSTRAINT transactions_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.users(user_id);
-
-
---
--- Name: transactions transactions_token_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: transactions transactions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.transactions
-    ADD CONSTRAINT transactions_token_id_fkey FOREIGN KEY (token_id) REFERENCES public.tokens(token_id);
-
-
---
--- Name: user_roles user_roles_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_roles
-    ADD CONSTRAINT user_roles_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(role_id);
+    ADD CONSTRAINT transactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
 
 
 --
@@ -898,178 +362,45 @@ ALTER TABLE ONLY public.user_roles
 
 
 --
--- Name: TABLE campaigns; Type: ACL; Schema: public; Owner: -
+-- Name: TABLE property_campaigns; Type: ACL; Schema: public; Owner: -
 --
 
-GRANT SELECT ON TABLE public.campaigns TO yohannravino;
-
-
---
--- Name: SEQUENCE campaigns_campaign_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.campaigns_campaign_id_seq TO yohannravino;
+GRANT ALL ON TABLE public.property_campaigns TO yohannravino;
 
 
 --
--- Name: TABLE contributions; Type: ACL; Schema: public; Owner: -
+-- Name: SEQUENCE property_campaigns_id_seq; Type: ACL; Schema: public; Owner: -
 --
 
-GRANT SELECT ON TABLE public.contributions TO yohannravino;
-
-
---
--- Name: SEQUENCE contributions_contribution_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.contributions_contribution_id_seq TO yohannravino;
+GRANT SELECT,USAGE ON SEQUENCE public.property_campaigns_id_seq TO yohannravino;
 
 
 --
--- Name: TABLE fees; Type: ACL; Schema: public; Owner: -
+-- Name: TABLE rented_properties; Type: ACL; Schema: public; Owner: -
 --
 
-GRANT SELECT ON TABLE public.fees TO yohannravino;
-
-
---
--- Name: SEQUENCE fees_fee_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.fees_fee_id_seq TO yohannravino;
-
-
---
--- Name: TABLE financial_details; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT ON TABLE public.financial_details TO yohannravino;
-
-
---
--- Name: SEQUENCE financial_details_financial_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.financial_details_financial_id_seq TO yohannravino;
-
-
---
--- Name: TABLE investor_properties; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT ON TABLE public.investor_properties TO yohannravino;
-
-
---
--- Name: SEQUENCE investor_properties_investor_property_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.investor_properties_investor_property_id_seq TO yohannravino;
-
-
---
--- Name: TABLE modulations; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT ON TABLE public.modulations TO yohannravino;
-
-
---
--- Name: SEQUENCE modulations_modulation_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.modulations_modulation_id_seq TO yohannravino;
-
-
---
--- Name: TABLE payments; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT ON TABLE public.payments TO yohannravino;
-
-
---
--- Name: SEQUENCE payments_payment_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.payments_payment_id_seq TO yohannravino;
-
-
---
--- Name: TABLE properties; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT ON TABLE public.properties TO yohannravino;
-
-
---
--- Name: SEQUENCE properties_property_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.properties_property_id_seq TO yohannravino;
-
-
---
--- Name: TABLE roi; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT ON TABLE public.roi TO yohannravino;
-
-
---
--- Name: SEQUENCE roi_roi_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.roi_roi_id_seq TO yohannravino;
-
-
---
--- Name: TABLE roles; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT ON TABLE public.roles TO yohannravino;
-
-
---
--- Name: SEQUENCE roles_role_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.roles_role_id_seq TO yohannravino;
-
-
---
--- Name: TABLE tokens; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT ON TABLE public.tokens TO yohannravino;
+GRANT ALL ON TABLE public.rented_properties TO yohannravino;
 
 
 --
 -- Name: TABLE transactions; Type: ACL; Schema: public; Owner: -
 --
 
-GRANT SELECT ON TABLE public.transactions TO yohannravino;
-
-
---
--- Name: SEQUENCE transactions_transaction_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.transactions_transaction_id_seq TO yohannravino;
+GRANT ALL ON TABLE public.transactions TO yohannravino;
 
 
 --
 -- Name: TABLE user_roles; Type: ACL; Schema: public; Owner: -
 --
 
-GRANT SELECT ON TABLE public.user_roles TO yohannravino;
+GRANT ALL ON TABLE public.user_roles TO yohannravino;
 
 
 --
 -- Name: TABLE users; Type: ACL; Schema: public; Owner: -
 --
 
-GRANT SELECT ON TABLE public.users TO yohannravino;
+GRANT ALL ON TABLE public.users TO yohannravino;
 
 
 --

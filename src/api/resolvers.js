@@ -10,13 +10,23 @@ const resolvers = {
       return result.rows
     },
     getUserById: async (_, { auth0_id }) => {
+      // récupérer l'utilisateur basé sur auth0_id
       const user = await pool.query('SELECT * FROM users WHERE auth0_id = $1', [
         auth0_id,
       ])
+
+      // vérifiez si l'utilisateur existe
+      if (user.rows.length === 0) {
+        throw new Error('User not found')
+      }
+
+      // récupérer les rôles de l'utilisateur
       const roles = await pool.query(
         'SELECT r.* FROM roles r JOIN user_roles ur ON r.role_id = ur.role_id WHERE ur.user_id = $1',
         [user.rows[0].user_id],
       )
+
+      // retourner l'utilisateur et ses rôles
       return {
         ...user.rows[0],
         roles: roles.rows,
@@ -25,10 +35,6 @@ const resolvers = {
 
     async getAllUsers() {
       const result = await pool.query('SELECT * FROM users')
-      return result.rows
-    },
-    async getTransactions() {
-      const result = await pool.query('SELECT * FROM transactions')
       return result.rows
     },
     getPropertyCampaign: async (_, { id }) => {
@@ -41,6 +47,11 @@ const resolvers = {
     getAllPropertyCampaigns: async () => {
       const campaigns = await pool.query('SELECT * FROM property_campaigns')
       return campaigns.rows
+    },
+
+    async getTransactions() {
+      const result = await pool.query('SELECT * FROM transactions')
+      return result.rows
     },
   },
   Mutation: {
@@ -90,25 +101,43 @@ const resolvers = {
       return true
     },
     addUserRole: async (_, { auth0_id, roleName }) => {
-      // Récupérez l'ID de l'utilisateur et l'ID du rôle ('visitor'), ('seller'), ('investor'), ('buyer');
+      // Récupérez l'ID de l'utilisateur
       const user = (
         await pool.query('SELECT user_id FROM users WHERE auth0_id = $1', [
           auth0_id,
         ])
       ).rows[0]
+
+      if (!user) {
+        throw new Error('User not found')
+      }
+
+      // Récupérez l'ID du rôle
       const role = (
         await pool.query('SELECT role_id FROM roles WHERE name = $1', [
           roleName,
         ])
       ).rows[0]
 
-      if (!user || !role) {
-        throw new Error('User or role not found')
+      if (!role) {
+        throw new Error('Role not found')
+      }
+
+      // Vérifiez si le rôle existe déjà pour l'utilisateur
+      const existingRole = (
+        await pool.query(
+          'SELECT * FROM user_roles WHERE user_id = $1 AND role_id = $2',
+          [user.user_id, role.role_id],
+        )
+      ).rows[0]
+
+      if (existingRole) {
+        throw new Error('Role already exists for this user')
       }
 
       // Ajoutez le rôle à l'utilisateur
       await pool.query(
-        'INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+        'INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)',
         [user.user_id, role.role_id],
       )
 
@@ -132,40 +161,17 @@ const resolvers = {
       }
 
       // Supprimez le rôle de l'utilisateur
-      await pool.query(
+      const result = await pool.query(
         'DELETE FROM user_roles WHERE user_id = $1 AND role_id = $2',
         [user.user_id, role.role_id],
       )
 
+      // Vérifiez si le rôle a été supprimé
+      if (result.rowCount === 0) {
+        throw new Error('Role was not found for this user')
+      }
+
       return true
-    },
-    async createTransaction(_, { input }) {
-      const { propertyCampaignId, userId, amount } = input
-      const query = `
-        INSERT INTO transactions (property_campaign_id, user_id, amount)
-        VALUES ($1, $2, $3)
-        RETURNING *`
-      const values = [propertyCampaignId, userId, amount]
-      const result = await pool.query(query, values)
-      return result.rows[0]
-    },
-    async updateTransaction(_, { transaction_id, input }) {
-      const fields = Object.keys(input).map(
-        (key, index) => `${key} = $${index + 1}`,
-      )
-      const values = Object.values(input).concat(transaction_id)
-      const query = `UPDATE transactions SET ${fields.join(
-        ', ',
-      )} WHERE transaction_id = $${values.length} RETURNING *`
-      const result = await pool.query(query, values)
-      return result.rows[0]
-    },
-    async deleteTransaction(_, { transaction_id }) {
-      const result = await pool.query(
-        'DELETE FROM transactions WHERE transaction_id = $1',
-        [transaction_id],
-      )
-      return result.rowCount > 0
     },
     async createPropertyCampaign(_, { input }) {
       const values = Object.values(input)
@@ -192,6 +198,34 @@ const resolvers = {
       const result = await pool.query(
         'DELETE FROM property_campaigns WHERE id = $1 RETURNING *',
         [id],
+      )
+      return result.rowCount > 0
+    },
+    async createTransaction(_, { input }) {
+      const { propertyCampaignId, userId, amount } = input
+      const query = `
+        INSERT INTO transactions (property_campaign_id, user_id, amount)
+        VALUES ($1, $2, $3)
+        RETURNING *`
+      const values = [propertyCampaignId, userId, amount]
+      const result = await pool.query(query, values)
+      return result.rows[0]
+    },
+    async updateTransaction(_, { transaction_id, input }) {
+      const fields = Object.keys(input).map(
+        (key, index) => `${key} = $${index + 1}`,
+      )
+      const values = Object.values(input).concat(transaction_id)
+      const query = `UPDATE transactions SET ${fields.join(
+        ', ',
+      )} WHERE transaction_id = $${values.length} RETURNING *`
+      const result = await pool.query(query, values)
+      return result.rows[0]
+    },
+    async deleteTransaction(_, { transaction_id }) {
+      const result = await pool.query(
+        'DELETE FROM transactions WHERE transaction_id = $1',
+        [transaction_id],
       )
       return result.rowCount > 0
     },
@@ -223,12 +257,10 @@ const resolvers = {
             [name, userEmail, auth0Id, walletAddress],
           )
 
-          const visitorRoleId = (
-            await pool.query("SELECT role_id FROM roles WHERE name = 'visitor'")
-          ).rows[0].role_id
+          const investorRole = 'INVESTOR'
           await pool.query(
-            'INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)',
-            [newUser.rows[0].user_id, visitorRoleId],
+            'INSERT INTO user_roles (user_id, role) VALUES ($1, $2)',
+            [newUser.rows[0].user_id, investorRole],
           )
 
           if (auth0Id) {
