@@ -1,7 +1,8 @@
 // src/graphql/resolvers.js
-
+const { v4: uuidv4 } = require('uuid')
 const pool = require('../config/database')
 const stripe = require('../config/stripe')
+const cloudinary = require('../config/cloudinary')
 
 const resolvers = {
   Query: {
@@ -174,14 +175,28 @@ const resolvers = {
       return true
     },
     async createPropertyCampaign(_, { input }) {
-      const values = Object.values(input)
-      const query = `INSERT INTO property_campaigns (${Object.keys(input).join(
-        ', ',
-      )}) VALUES (${values
-        .map((_, idx) => `$${idx + 1}`)
-        .join(', ')}) RETURNING *`
-      const result = await pool.query(query, values)
-      return result.rows[0]
+      try {
+        // Uploadez l'image sur Cloudinary si elle est fournie
+        if (input.image) {
+          const result = await cloudinary.uploader.upload(input.image)
+          input.image_url = result.secure_url // Utilisez l'URL sécurisée pour stocker en base de données
+          delete input.image // Supprimez l'image d'entrée originale, nous n'en avons plus besoin
+        }
+        const values = Object.values(input)
+        const query = `INSERT INTO property_campaigns (${Object.keys(
+          input,
+        ).join(', ')}) VALUES (${values
+          .map((_, idx) => `$${idx + 1}`)
+          .join(', ')}) RETURNING *`
+        const result = await pool.query(query, values)
+        return result.rows[0]
+      } catch (error) {
+        console.error(
+          "Erreur lors de l'upload de l'image ou de l'insertion dans la DB",
+          error,
+        )
+        throw new Error('Erreur lors de la création de la campagne')
+      }
     },
     updatePropertyCampaign: async (_, { id, input }) => {
       const fields = Object.keys(input).map(
@@ -202,32 +217,63 @@ const resolvers = {
       return result.rowCount > 0
     },
     async createTransaction(_, { input }) {
-      const { propertyCampaignId, userId, amount } = input
+      const { propertyCampaignId, userId, amount, type } = input
+      const timestamp = new Date().toISOString()
+      const id = uuidv4()
       const query = `
-        INSERT INTO transactions (property_campaign_id, user_id, amount)
-        VALUES ($1, $2, $3)
+        INSERT INTO transactions (id, property_campaign_id, user_id, amount, type, timestamp)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *`
-      const values = [propertyCampaignId, userId, amount]
+      const values = [id, propertyCampaignId, userId, amount, type, timestamp]
       const result = await pool.query(query, values)
-      return result.rows[0]
+
+      // Vérifiez si une ligne a été retournée.
+      if (result.rows.length === 0) {
+        throw new Error('Transaction could not be created.')
+      }
+
+      const transaction = result.rows[0]
+
+      // Récupérez les informations de l'utilisateur.
+      const userQuery = `SELECT * FROM users WHERE user_id = $1`
+      const userResult = await pool.query(userQuery, [transaction.user_id])
+
+      // Vérifiez si l'utilisateur existe.
+      if (userResult.rows.length === 0) {
+        throw new Error('User does not exist.')
+      }
+
+      transaction.user = userResult.rows[0]
+
+      return transaction
     },
-    async updateTransaction(_, { transaction_id, input }) {
+    async updateTransaction(_, { id, input }) {
       const fields = Object.keys(input).map(
         (key, index) => `${key} = $${index + 1}`,
       )
-      const values = Object.values(input).concat(transaction_id)
-      const query = `UPDATE transactions SET ${fields.join(
-        ', ',
-      )} WHERE transaction_id = $${values.length} RETURNING *`
+      const values = Object.values(input).concat(id)
+      const query = `UPDATE transactions SET ${fields.join(', ')} WHERE id = $${
+        values.length
+      } RETURNING *`
       const result = await pool.query(query, values)
+
+      if (result.rows.length === 0) {
+        throw new Error('Transaction could not be updated.')
+      }
+
       return result.rows[0]
     },
-    async deleteTransaction(_, { transaction_id }) {
+    async deleteTransaction(_, { id }) {
       const result = await pool.query(
-        'DELETE FROM transactions WHERE transaction_id = $1',
-        [transaction_id],
+        'DELETE FROM transactions WHERE id = $1 RETURNING *',
+        [id],
       )
-      return result.rowCount > 0
+
+      if (result.rows.length === 0) {
+        throw new Error('Transaction could not be deleted.')
+      }
+
+      return true
     },
     ensureUser: async (_, { auth0Id, email, walletAddress }) => {
       try {

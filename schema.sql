@@ -96,7 +96,7 @@ CREATE TABLE public.property_campaigns (
     end_date date,
     status character varying NOT NULL,
     initial_deposit double precision,
-    renovation_cost double precision NOT NULL,
+    renovation_cost double precision,
     notary_fees double precision,
     loan_amount double precision,
     interest_cost double precision,
@@ -159,24 +159,20 @@ ALTER SEQUENCE public.rented_properties_id_seq OWNED BY public.rented_properties
 
 
 --
--- Name: transactions; Type: TABLE; Schema: public; Owner: -
+-- Name: roles; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.transactions (
-    id integer NOT NULL,
-    user_id integer,
-    amount double precision NOT NULL,
-    type public.transaction_type NOT NULL,
-    property_campaign_id integer,
-    "timestamp" timestamp without time zone NOT NULL
+CREATE TABLE public.roles (
+    role_id integer NOT NULL,
+    name text NOT NULL
 );
 
 
 --
--- Name: transactions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: roles_role_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.transactions_id_seq
+CREATE SEQUENCE public.roles_role_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -186,10 +182,24 @@ CREATE SEQUENCE public.transactions_id_seq
 
 
 --
--- Name: transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: roles_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.transactions_id_seq OWNED BY public.transactions.id;
+ALTER SEQUENCE public.roles_role_id_seq OWNED BY public.roles.role_id;
+
+
+--
+-- Name: transactions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.transactions (
+    id uuid NOT NULL,
+    user_id integer,
+    amount double precision NOT NULL,
+    type public.transaction_type NOT NULL,
+    property_campaign_id integer,
+    "timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
 
 
 --
@@ -198,7 +208,7 @@ ALTER SEQUENCE public.transactions_id_seq OWNED BY public.transactions.id;
 
 CREATE TABLE public.user_roles (
     user_id integer,
-    role public.role NOT NULL
+    role_id integer
 );
 
 
@@ -260,10 +270,10 @@ ALTER TABLE ONLY public.rented_properties ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- Name: transactions id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: roles role_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.transactions ALTER COLUMN id SET DEFAULT nextval('public.transactions_id_seq'::regclass);
+ALTER TABLE ONLY public.roles ALTER COLUMN role_id SET DEFAULT nextval('public.roles_role_id_seq'::regclass);
 
 
 --
@@ -298,19 +308,27 @@ ALTER TABLE ONLY public.rented_properties
 
 
 --
+-- Name: roles roles_name_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_name_key UNIQUE (name);
+
+
+--
+-- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_pkey PRIMARY KEY (role_id);
+
+
+--
 -- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.transactions
     ADD CONSTRAINT transactions_pkey PRIMARY KEY (id);
-
-
---
--- Name: user_roles user_roles_user_id_role_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_roles
-    ADD CONSTRAINT user_roles_user_id_role_key UNIQUE (user_id, role);
 
 
 --
@@ -338,19 +356,11 @@ ALTER TABLE ONLY public.rented_properties
 
 
 --
--- Name: transactions transactions_property_campaign_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_roles user_roles_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.transactions
-    ADD CONSTRAINT transactions_property_campaign_id_fkey FOREIGN KEY (property_campaign_id) REFERENCES public.property_campaigns(id);
-
-
---
--- Name: transactions transactions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.transactions
-    ADD CONSTRAINT transactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
+ALTER TABLE ONLY public.user_roles
+    ADD CONSTRAINT user_roles_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(role_id);
 
 
 --
@@ -380,6 +390,13 @@ GRANT SELECT,USAGE ON SEQUENCE public.property_campaigns_id_seq TO yohannravino;
 --
 
 GRANT ALL ON TABLE public.rented_properties TO yohannravino;
+
+
+--
+-- Name: TABLE roles; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT SELECT ON TABLE public.roles TO yohannravino;
 
 
 --

@@ -39,7 +39,7 @@ const typeDefs = gql`
     id: ID!
     description: String!
     localisation: String!
-    total_value: Float!
+    total_value: Float
     charges_estimation: Float
     energy_bill_estimation: Float
     construction_year: Int
@@ -63,9 +63,15 @@ const typeDefs = gql`
     loan_duration: Int
     total_paid: Int
     total_remaining: Float
+    image: String
+    title: String
+    property_type: String
+    price: Float
   }
 
   enum CampaignStatus {
+    CHECKING
+    SOON
     ONGOING
     COMPLETED
     FAILED
@@ -73,8 +79,8 @@ const typeDefs = gql`
 
   type Transaction {
     id: ID!
-    user: User!
-    amount: Float!
+    user: User
+    amount: Float
     type: TransactionType
     propertyCampaign: PropertyCampaign
     timestamp: String
@@ -150,12 +156,17 @@ const typeDefs = gql`
     loan_amount: Float
     interest_cost: Float
     loan_duration: Int
+    image: String
+    title: String
+    property_type: String
+    price: Float
   }
 
   input TransactionInput {
-    propertyCampaignId: ID!
-    userId: ID!
-    amount: Float!
+    propertyCampaignId: ID
+    userId: ID
+    amount: Float
+    type: TransactionType
   }
 `
 

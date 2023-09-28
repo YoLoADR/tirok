@@ -73,3 +73,19 @@ http://localhost:3003/logout
 
 http://localhost:3003/graphql
 .
+
+## 10 . PostGreSQL
+
+Effacer une table
+DROP TABLE IF EXISTS transactions;
+Creer une table avec un id auto generer
+CREATE TABLE public.transactions (
+id SERIAL PRIMARY KEY,
+user_id integer,
+amount double precision NOT NULL,
+type public.transaction_type NOT NULL,
+property_campaign_id integer,
+"timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+Donner fullaccess à l'utilisateur
+GRANT ALL PRIVILEGES ON TABLE transactions TO yohannravino;
