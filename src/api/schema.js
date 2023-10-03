@@ -39,9 +39,6 @@ const typeDefs = gql`
     id: ID!
     description: String!
     localisation: String!
-    total_value: Float
-    charges_estimation: Float
-    energy_bill_estimation: Float
     construction_year: Int
     room_count: Int
     bedroom_count: Int
@@ -49,23 +46,26 @@ const typeDefs = gql`
     area: Float
     dpe: String
     ges: String
-    goal_amount: Float
-    current_amount: Float
     start_date: String
     end_date: String
     status: CampaignStatus!
     contributors: [User!]
-    initial_deposit: Float
-    renovation_cost: Float
     notary_fees: Float
-    loan_amount: Float
     interest_cost: Float
     loan_duration: Int
-    total_paid: Int
-    total_remaining: Float
-    image: String
+    loan_amount: Float
+    image_url: String
     title: String
     property_type: String
+    initial_deposit: Float
+    renovation_cost: Float
+    total_paid: Int
+    total_remaining: Float
+    current_amount: Float
+    goal_amount: Float
+    total_value: Float
+    charges_estimation: Float
+    energy_bill_estimation: Float
     price: Float
   }
 
@@ -156,7 +156,7 @@ const typeDefs = gql`
     loan_amount: Float
     interest_cost: Float
     loan_duration: Int
-    image: String
+    image_url: String
     title: String
     property_type: String
     price: Float
