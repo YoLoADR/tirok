@@ -217,14 +217,14 @@ const resolvers = {
       return result.rowCount > 0
     },
     async createTransaction(_, { input }) {
-      const { propertyCampaignId, userId, amount, type } = input
+      const { propertyCampaignId, userId, amount, type, referrerId } = input
       const timestamp = new Date().toISOString()
       const id = uuidv4()
       const query = `
-        INSERT INTO transactions (id, property_campaign_id, user_id, amount, type, timestamp)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO transactions (id, property_campaign_id, user_id, amount, type, referrer_id timestamp)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *`
-      const values = [id, propertyCampaignId, userId, amount, type, timestamp]
+      const values = [id, propertyCampaignId, userId, amount, type, referrerId, timestamp]
       const result = await pool.query(query, values)
 
       // Vérifiez si une ligne a été retournée.
@@ -244,6 +244,11 @@ const resolvers = {
       }
 
       transaction.user = userResult.rows[0]
+
+      if (transaction.referrer_id) {
+        // TODO : Logique de récompense pour l'utilisateur avec l'ID referrer_id.
+        console.log("Transaction réaliser via une recommandatio !!", transaction.referrer_id)
+      }
 
       return transaction
     },
@@ -275,12 +280,13 @@ const resolvers = {
 
       return true
     },
-    ensureUser: async (_, { auth0Id, email, walletAddress }) => {
+    ensureUser: async (_, { auth0Id, email, walletAddress, referrerId }) => {
       try {
         let user
         console.log('auth0Id', auth0Id)
         console.log('email', email)
         console.log('walletAddress', walletAddress)
+        console.log('referrerId', referrerId)
 
         if (auth0Id) {
           user = await pool.query('SELECT * FROM users WHERE auth0_id = $1', [
@@ -299,15 +305,28 @@ const resolvers = {
           const userEmail = email || `${walletAddress}@placeholder.com`
 
           const newUser = await pool.query(
-            'INSERT INTO users (username, email, auth0_id, wallet_address) VALUES ($1, $2, $3, $4) RETURNING user_id',
-            [name, userEmail, auth0Id, walletAddress],
+            'INSERT INTO users (username, email, auth0_id, wallet_address, referrer_id) VALUES ($1, $2, $3, $4, $5) RETURNING user_id',
+            [name, userEmail, auth0Id, walletAddress, referrerId],
           )
 
           const investorRole = 'INVESTOR'
-          await pool.query(
-            'INSERT INTO user_roles (user_id, role) VALUES ($1, $2)',
-            [newUser.rows[0].user_id, investorRole],
-          )
+          // Get the role_id for the 'INVESTOR' role
+          const roleRes = await pool.query(
+            'SELECT role_id FROM roles WHERE name = $1',
+            [investorRole]
+          );
+
+          if (roleRes.rows.length > 0) {
+            const roleId = roleRes.rows[0].role_id;
+
+            // Insert the user_id and role_id into the user_roles table
+            await pool.query(
+                'INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)',
+                [newUser.rows[0].user_id, roleId],
+            );
+          } else {
+            console.error("Role 'INVESTOR' not found in the roles table.");
+          }
 
           if (auth0Id) {
             const customer = await stripe.customers.create({
@@ -319,6 +338,11 @@ const resolvers = {
               'UPDATE users SET stripe_customer_id = $1 WHERE user_id = $2',
               [customer.id, newUser.rows[0].user_id],
             )
+          }
+          if (referrerId) {
+            // Enregistrez referrerId en base de données avec les autres détails de l'utilisateur.
+            // TODO : Logique de récompense pour l'utilisateur avec l'ID referrer_id.
+            console.log("Creation d'un nouvel utilisateur grace à une recommandation", referrerId);
           }
 
           return true // utilisateur créé avec succès

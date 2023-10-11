@@ -22,6 +22,7 @@ const typeDefs = gql`
     total_invested: Float
     total_tokens: Int
     stripe_customer_id: String
+    referrerId: ID
   }
 
   type Role {
@@ -84,6 +85,7 @@ const typeDefs = gql`
     type: TransactionType
     propertyCampaign: PropertyCampaign
     timestamp: String
+    referrerId: ID
   }
 
   enum TransactionType {
@@ -108,7 +110,7 @@ const typeDefs = gql`
     createUser(input: UserInput!): User
     updateUser(id: ID!, input: UserInput!): User
     deleteUser(id: ID!): Boolean
-    ensureUser(auth0Id: String, email: String, walletAddress: String): Boolean
+    ensureUser(auth0Id: String, email: String, walletAddress: String, referrerId: ID): Boolean
 
     addUserRole(auth0_id: String!, roleName: String!): Boolean
     removeUserRole(auth0_id: String!, roleName: String!): Boolean
@@ -167,6 +169,7 @@ const typeDefs = gql`
     userId: ID
     amount: Float
     type: TransactionType
+    referrerId: ID
   }
 `
 

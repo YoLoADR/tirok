@@ -102,7 +102,11 @@ CREATE TABLE public.property_campaigns (
     interest_cost double precision,
     loan_duration integer,
     total_paid double precision,
-    total_remaining double precision
+    total_remaining double precision,
+    image_url text,
+    title text,
+    property_type text,
+    price numeric
 );
 
 
